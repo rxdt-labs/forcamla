@@ -20,7 +20,7 @@ val t : 'a -> 'a formula
 
 (** {1 Update Term Methods} *)
 
-(** Update an int term to a new value. (If the supplied formula is {i not} a term, an error is thrown.) *)
+(** Update a term to a new value. (If the supplied formula is {i not} a term, an error is thrown.) *)
 val (=:) : 'a formula -> 'a -> unit
 
 (** {1 Extraction: Get the (current) value for a [formula] or [system]} *)
@@ -215,10 +215,10 @@ val listen : 'a source -> unit
 (** {1 Event listener constructors} *)
 
 (** Listen and execute a function when a [formula] changes value. *)
-val on_change : 'a formula -> (unit -> unit) -> unit
+val on_change : 'a formula -> ('a -> 'a -> unit) -> unit
 
 (** Listen and execute a function when a [system] changes value. *)
-val system_change : 'a system -> (unit -> unit) -> unit
+val system_change : 'a system -> (bool -> bool -> unit) -> unit
 
 (** Listen and execute when a [system] becomes true. *)
 val when_satisfied : 'a system -> (unit -> unit) -> unit

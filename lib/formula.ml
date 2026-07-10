@@ -11,7 +11,7 @@ and 'a formula =
 {
   mutable parents: 'a formula list;
   mutable pred_parents: 'a system list;
-  mutable on_change: (unit -> unit) list;
+  mutable on_change: ('a -> 'a -> unit) list;
   mutable value: 'a;
   expression: 'a expr;
   mutable needs_update: bool;
@@ -30,7 +30,7 @@ and 'a system =
 {
   mutable parents: 'a system list;
   mutable when_satisfied: (unit -> unit) list;
-  mutable on_change: (unit -> unit) list;
+  mutable on_change: (bool -> bool -> unit) list;
   mutable value: bool;
   expression: 'a system_expr;
   mutable needs_update: bool;
@@ -64,42 +64,47 @@ let eval (f: 'a formula): 'a =
 let eval_system (eq: 'a system): bool = 
   if eq.needs_update then eval_system_expr eq.expression else eq.value
 
-let rec propegate (f: 'a formula): unit =
-  List.iter (fun g -> g ()) f.on_change;
+let rec propegate (f: 'a formula) (old_val: 'a): unit =
+  List.iter (fun g -> g old_val f.value) f.on_change;
   List.iter (fun p -> p.needs_update <- true) f.parents;
   List.iter (fun (p: 'a system) -> p.needs_update <- true) f.pred_parents;
   List.iter update_a_formula f.parents;
   List.iter update_system f.pred_parents;
   f.needs_update <- false
-and propegate_system (eq: 'a system): unit =
-  List.iter (fun g -> g ()) eq.on_change;
+and propegate_system (eq: 'a system) (old_value: bool): unit =
+  List.iter (fun g -> g old_value eq.value) eq.on_change;
   if eq.value = true then 
     (List.iter (fun g -> g ()) eq.when_satisfied;
     List.iter (fun (p: 'a system) -> p.needs_update <- true) eq.parents) else ()
 and update_a_term (f: 'a formula) (new_val: 'a) =
+  let old_val = f.value in
   match f.expression with
   | Val t ->
       if !t <> new_val then
      (t := new_val;
       f.value <- new_val;
-      propegate f) else ()
+      propegate f old_val) else ()
   | _ -> raise (NotATermException "Formula is not a term and cannot be reassigned.")
 and update_a_formula (f: 'a formula) =
   let new_val = eval f in
+  let old_val = f.value in
   if f.value <> new_val then
     (f.value <- new_val;
-     propegate f)
+     propegate f old_val)
 and update_system (s: 'a system): unit =
   match s.expression with
   | Single a -> let new_val = eval_expr_equation a in
+                let old_val = s.value in
     if new_val <> s.value then
-      (s.value <- new_val; propegate_system s)
+      (s.value <- new_val; propegate_system s old_val)
   | And (a, b) -> let new_val = (eval_system_expr a) && (eval_system_expr b) in
+                  let old_val = s.value in
     if new_val <> s.value then
-      (s.value <- new_val; propegate_system s)
+      (s.value <- new_val; propegate_system s old_val)
   | Or (a, b) -> let new_val = (eval_system_expr a) || (eval_system_expr b) in
+                 let old_val = s.value in
     if new_val <> s.value then
-      (s.value <- new_val; propegate_system s)
+      (s.value <- new_val; propegate_system s old_val)
 
 (* Create a formula helper. *)
 let formula_create (e: 'a expr) (value: 'a) =
@@ -262,7 +267,7 @@ let listen (s: 'a source): unit =
   List.iter (fun pair -> if eval_system (fst pair) then (snd pair) () else ()) s.sys_func
 
 (* Listeners *)
-let on_change (f: 'a formula) (g: unit -> unit) = f.on_change <- g :: f.on_change
-let system_change (f: 'a system) (g: unit -> unit) = f.on_change <- g :: f.on_change
+let on_change (f: 'a formula) (g: 'a -> 'a -> unit) = f.on_change <- g :: f.on_change
+let system_change (f: 'a system) (g: bool -> bool -> unit) = f.on_change <- g :: f.on_change
 let when_satisfied (f: 'a system) (g: unit -> unit) = f.when_satisfied <- g :: f.when_satisfied
 let exec_while (src: 'a source) (s: 'a system) (g: unit -> unit) = src.sys_func <- (s, g) :: src.sys_func
