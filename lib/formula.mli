@@ -195,6 +195,10 @@ val (&&) : 'a system -> 'a system -> 'a system
 (** Shorthand for oring two equations together. *)
 val (||) : 'a system -> 'a system -> 'a system
 
+(** Create a binary operation from an operation that takes 'a type inputs. *)
+val formula_reg_bin : ('a -> 'a -> 'a) -> ('a formula -> 'a formula -> 'a formula)
+
+
 (** {1 [source] Operations} *)
 
 type 'a source

@@ -258,6 +258,10 @@ let or_eqs (s1: 'a system) (s2: 'a system) = sys_make (||) (fun a b -> Or (a.exp
   s1 s2
 let (||) = or_eqs
 
+(* For everything else that needs to be user defined. *)
+let formula_reg_bin (op: 'a -> 'a -> 'a): ('a formula -> 'a formula -> 'a formula) = 
+  bin_form_a op (fun a b -> BinOp (a, b, op))
+
 (* Source functions. *)
 
 let make_int_source (): int source = { sys_func = []; }
