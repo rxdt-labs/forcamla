@@ -264,8 +264,7 @@ let formula_reg_bin (op: 'a -> 'a -> 'a): ('a formula -> 'a formula -> 'a formul
 
 (* Source functions. *)
 
-let make_int_source (): int source = { sys_func = []; }
-let make_float_source (): int source = { sys_func = []; }
+let make_source (): 'a source = { sys_func = []; }
 
 let listen (s: 'a source): unit =
   List.iter (fun pair -> if eval_system (fst pair) then (snd pair) () else ()) s.sys_func

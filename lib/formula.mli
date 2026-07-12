@@ -204,11 +204,8 @@ val formula_reg_bin : ('a -> 'a -> 'a) -> ('a formula -> 'a formula -> 'a formul
 
 type 'a source
 
-(** Make a source to listen with. (With int formulas) *)
-val make_int_source : unit -> int source
-
-(** Make a source to listen with (With float formulas) *)
-val make_float_source : unit -> int source
+(** Make a source to listen with. *)
+val make_source : unit -> 'a source
 
 (** Listen with a specified source *)
 val listen : 'a source -> unit

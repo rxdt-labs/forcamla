@@ -173,7 +173,7 @@ let test_source_simple () =
   let x = ref 0 in
   let g () = x := (!x + 1) in
   let open Formula in
-  let s = make_int_source () in
+  let s = make_source () in
   let y = t 0 in
   let test = (y >=? t 3) in
   exec_while s test g;
