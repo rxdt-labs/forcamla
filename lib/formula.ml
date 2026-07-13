@@ -4,6 +4,7 @@ exception NotATermException of string
 (* Stores the arithmetic expression of a formula. *)
 type 'a expr =
   Val of 'a ref
+| UnaryOp of 'a expr * ('a -> 'a)
 | BinOp of 'a expr * 'a expr * ('a -> 'a -> 'a)
 
 (* Basically 'a expr, but with some additional fields for updating. *)
@@ -44,6 +45,7 @@ type 'a source =
 (* Evaluate what an float expr currently should be. *)
 let rec eval_expr (e: 'a expr): 'a =
   match e with
+    | UnaryOp (a, op) -> op (eval_expr a)
     | BinOp (a, b, op) -> op (eval_expr a) (eval_expr b)
     | Val x      -> !x
 
