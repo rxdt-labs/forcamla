@@ -40,7 +40,8 @@ and 'a system =
 
 type 'a source =
 {
-  mutable sys_func : ('a system * (unit -> unit)) list;
+  mutable exec_while : ('a system * (unit -> unit)) list;
+  mutable exec_always : ('a system * (bool -> unit)) list;
 }
 
 (* Evaluate what an float expr currently should be. *)
@@ -268,13 +269,20 @@ let formula_reg_bin (op: 'a -> 'a -> 'a): ('a formula -> 'a formula -> 'a formul
 
 (* Source functions. *)
 
-let make_source (): 'a source = { sys_func = []; }
+let make_source (): 'a source = 
+{
+  exec_while = []; 
+  exec_always = [];
+}
 
 let listen (s: 'a source): unit =
-  List.iter (fun pair -> if eval_system (fst pair) then (snd pair) () else ()) s.sys_func
+  (* Execute the exec_while functions if the condition is true. *)
+  List.iter (fun pair -> if eval_system (fst pair) then (snd pair) () else ()) s.exec_while;
+  (* Next execute the exec_always function regardless and supply the value of the system. *)
+  List.iter (fun pair -> (snd pair) (eval_system (fst pair))) s.exec_always
 
 (* Listeners *)
 let on_change (f: 'a formula) (g: 'a -> 'a -> unit) = f.on_change <- g :: f.on_change
 let system_change (f: 'a system) (g: bool -> bool -> unit) = f.on_change <- g :: f.on_change
 let when_satisfied (f: 'a system) (g: unit -> unit) = f.when_satisfied <- g :: f.when_satisfied
-let exec_while (src: 'a source) (s: 'a system) (g: unit -> unit) = src.sys_func <- (s, g) :: src.sys_func
+let exec_while (src: 'a source) (s: 'a system) (g: unit -> unit) = src.exec_while <- (s, g) :: src.exec_while
