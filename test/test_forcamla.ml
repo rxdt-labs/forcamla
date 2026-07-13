@@ -169,7 +169,7 @@ let test_player_health_ip () =
   health =: !(health - t 1);
   (check string) "same string" "In Play" x.contents
 
-let test_source_simple () =
+let test_source_simple_while () =
   let x = ref 0 in
   let g () = x := (!x + 1) in
   let open Formula in
@@ -188,7 +188,21 @@ let test_source_simple () =
   listen s;
   (check int) "same int" 2 x.contents
 
-
+let test_source_simple_always () =
+  let x = ref true in
+  let g (b: bool) = x := b in
+  let open Formula in
+  let s = make_source () in
+  let y = t 0 in
+  let test = (y >=? t 1) in
+  exec_always s test g;
+  (check bool) "same bool" true x.contents;
+  listen s;
+  (check bool) "same bool" false x.contents;
+  y =: !(y + t 1);
+  (check bool) "same bool" false x.contents;
+  listen s;
+  (check bool) "same bool" true x.contents
 
 let () =
   run "Utils" [
@@ -222,6 +236,7 @@ let () =
         test_case "Player health test (In Play)" `Quick test_player_health_ip;
       ];
       "sources", [
-        test_case "Simple source test." `Quick test_source_simple;
+        test_case "Simple source test for exec_while" `Quick test_source_simple_while;
+        test_case "Simple source test for exec_always" `Quick test_source_simple_always;
       ];
   ]

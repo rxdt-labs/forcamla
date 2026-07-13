@@ -226,6 +226,12 @@ val system_change : 'a system -> (bool -> bool -> unit) -> unit
 val when_satisfied : 'a system -> (unit -> unit) -> unit
 
 (** Source event listener. Suppose [s] has registered a system [eq].
+    Execute function if [listen s] is called and supply the current value of [eq].
+*)
+val exec_always : 'a source -> 'a system -> (bool -> unit) -> unit
+
+(** Source event listener. Suppose [s] has registered a system [eq].
     Execute function if the [eq] is currently [true] and [listen s] is called.
 *)
 val exec_while : 'a source -> 'a system -> (unit -> unit) -> unit
+

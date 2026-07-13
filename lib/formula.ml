@@ -285,4 +285,6 @@ let listen (s: 'a source): unit =
 let on_change (f: 'a formula) (g: 'a -> 'a -> unit) = f.on_change <- g :: f.on_change
 let system_change (f: 'a system) (g: bool -> bool -> unit) = f.on_change <- g :: f.on_change
 let when_satisfied (f: 'a system) (g: unit -> unit) = f.when_satisfied <- g :: f.when_satisfied
+let exec_always (src: 'a source) (s: 'a system) (g: bool -> unit) = src.exec_always <- (s, g) :: src.exec_always
 let exec_while (src: 'a source) (s: 'a system) (g: unit -> unit) = src.exec_while <- (s, g) :: src.exec_while
+
