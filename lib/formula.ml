@@ -19,7 +19,8 @@ and 'a formula =
 }
 (* Similar to 'a expr but for equations instead of formula. *)
 and 'a equation_expr =
-| Comp of 'a expr * 'a expr * ('a -> 'a -> bool)
+| LogicOp of 'a expr * ('a -> bool)
+| Comparison of 'a expr * 'a expr * ('a -> 'a -> bool)
 
 (* Similar to 'a expr and equation_expr but for systems of equations. *)
 and 'a system_expr =
@@ -52,7 +53,8 @@ let rec eval_expr (e: 'a expr): 'a =
 
 let rec eval_expr_equation (e: 'a equation_expr): bool =
   match e with
-    | Comp (a, b, op) -> op (eval_expr a) (eval_expr b)
+    | LogicOp (a, op) -> op (eval_expr a)
+    | Comparison (a, b, op) -> op (eval_expr a) (eval_expr b)
 
 let rec eval_system_expr (s: 'a system_expr): bool = match s with
 | Single a -> eval_expr_equation a
@@ -195,51 +197,51 @@ let comp_form_a (comp: 'a -> 'a -> bool)
   eq
 
 (* Equality of two int formulas. *)
-let eq_form_int = comp_form_a (=) (fun a b -> Comp (a.expression, b.expression, (=)))
+let eq_form_int = comp_form_a (=) (fun a b -> Comparison (a.expression, b.expression, (=)))
 let (=?) = eq_form_int
 
 (* Not equals of two int formulas. *)
-let ne_form_int = comp_form_a (<>) (fun a b -> Comp (a.expression, b.expression, (<>)))
+let ne_form_int = comp_form_a (<>) (fun a b -> Comparison (a.expression, b.expression, (<>)))
 let (<>?) = ne_form_int
 
 (* Equality of two float formulas. *)
-let eq_form_float = comp_form_a (=) (fun a b -> Comp (a.expression, b.expression, (=)))
+let eq_form_float = comp_form_a (=) (fun a b -> Comparison (a.expression, b.expression, (=)))
 let (=.) = eq_form_float
 
 (* Not equals of two float formulas. *)
-let ne_form_float = comp_form_a (<>) (fun a b -> Comp (a.expression, b.expression, (<>)))
+let ne_form_float = comp_form_a (<>) (fun a b -> Comparison (a.expression, b.expression, (<>)))
 let (<>.) = ne_form_float
 
 (* Greater than of two int formulas. *)
-let gt_form_int = comp_form_a (>) (fun a b -> Comp (a.expression, b.expression, (>)))
+let gt_form_int = comp_form_a (>) (fun a b -> Comparison (a.expression, b.expression, (>)))
 let (>?) = gt_form_int
 
 (* Greater than or equals of two int formulas. *)
-let gte_form_int = comp_form_a (>=) (fun a b -> Comp (a.expression, b.expression, (>=)))
+let gte_form_int = comp_form_a (>=) (fun a b -> Comparison (a.expression, b.expression, (>=)))
 let (>=?) = gte_form_int
 
 (* Greater than of two float formulas. *)
-let gt_form_float = comp_form_a (>) (fun a b -> Comp (a.expression, b.expression, (>)))
+let gt_form_float = comp_form_a (>) (fun a b -> Comparison (a.expression, b.expression, (>)))
 let (>.) = gt_form_float
 
 (* Greater than or equals of two float formulas. *)
-let gte_form_float = comp_form_a (>=) (fun a b -> Comp (a.expression, b.expression, (>=)))
+let gte_form_float = comp_form_a (>=) (fun a b -> Comparison (a.expression, b.expression, (>=)))
 let (>=.) = gte_form_float
 
 (* Less than of two int formulas. *)
-let lt_form_int = comp_form_a (>) (fun a b -> Comp (a.expression, b.expression, (<)))
+let lt_form_int = comp_form_a (>) (fun a b -> Comparison (a.expression, b.expression, (<)))
 let (<?) = lt_form_int
 
 (* Less than or equals of two int formulas. *)
-let lte_form_int = comp_form_a (>=) (fun a b -> Comp (a.expression, b.expression, (<=)))
+let lte_form_int = comp_form_a (>=) (fun a b -> Comparison (a.expression, b.expression, (<=)))
 let (<=?) = lte_form_int
 
 (* Less than of two float formulas. *)
-let lt_form_float = comp_form_a (>) (fun a b -> Comp (a.expression, b.expression, (<)))
+let lt_form_float = comp_form_a (>) (fun a b -> Comparison (a.expression, b.expression, (<)))
 let (<.) = lt_form_float
 
 (* Less than or equals of two float formulas. *)
-let lte_form_float = comp_form_a (>=) (fun a b -> Comp (a.expression, b.expression, (<=)))
+let lte_form_float = comp_form_a (>=) (fun a b -> Comparison (a.expression, b.expression, (<=)))
 let (<=.) = lte_form_float
 
 (* System creation *)
