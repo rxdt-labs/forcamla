@@ -6,7 +6,7 @@
 type 'a formula
 
 (** A collecction of equations (possibly a collection of one equation). {b Note:} For type safety reasons, [system] type is distinct from the [formula] type. *)
-type 'a system
+type 'b system
 
 (** {1 Term Creation} *)
 
@@ -16,20 +16,20 @@ type 'a system
 *)
 
 (** Lift basic types to term types. *)
-val t : 'a -> 'a formula
+val t : 'c -> 'c formula
 
 (** {1 Update Term Methods} *)
 
-(** Update an int term to a new value. (If the supplied formula is {i not} a term, an error is thrown.) *)
-val (=:) : 'a formula -> 'a -> unit
+(** Update a term to a new value. (If the supplied formula is {i not} a term, an error is thrown.) *)
+val (=:) : 'd formula -> 'd -> unit
 
 (** {1 Extraction: Get the (current) value for a [formula] or [system]} *)
 
 (** Get current value of a formula. Similar to [(!)] for ref types. *)
-val (!) : 'a formula -> 'a
+val (!) : 'e formula -> 'e
 
 (** Get current value of a system. Similar to [(!)] for ref types. *)
-val (!!) : 'a system -> bool
+val (!!) : 'f system -> bool
 
 (** {1 Formula creation methods} *)
 
@@ -92,6 +92,14 @@ val ( *. ) : float formula -> float formula -> float formula
 
 (** Shorthand for division in a float formula. *)
 val (/.) : float formula -> float formula -> float formula
+
+(** {2 Concat [string formula]} *)
+
+(** Create a formula that is the concatenation of two string formula. *)
+val concat_strings : string formula -> string formula -> string formula
+
+(** Shorthand for concatenation of two formula. *)
+val (^) : string formula -> string formula -> string formula
 
 (** {1 [system] Constructors} *)
 
@@ -182,31 +190,33 @@ val (<=.) : float formula -> float formula -> float system
 (* Connect equations via and or or. Shorthand mentioned later. *)
 
 (** And two equations together *)
-val and_eqs : 'a system -> 'a system -> 'a system
+val and_eqs : 'g system -> 'g system -> 'g system
 
 (** Or two equations together *)
-val or_eqs : 'a system -> 'a system -> 'a system
+val or_eqs : 'h system -> 'h system -> 'h system
 
 (** {2 Shorthand Combine [system] types} *)
 
 (** Shorthand for anding two equations together. *)
-val (&&) : 'a system -> 'a system -> 'a system
+val (&&) : 'i system -> 'i system -> 'i system
 
 (** Shorthand for oring two equations together. *)
-val (||) : 'a system -> 'a system -> 'a system
+val (||) : 'j system -> 'j system -> 'j system
+
+(** Create a binary operation from an operation that takes 'a type inputs. In
+ essence, lift an existing binary operator work on formulas. *)
+val formula_reg_bin : ('k -> 'k -> 'k) -> ('k formula -> 'k formula -> 'k formula)
+
 
 (** {1 [source] Operations} *)
 
-type 'a source
+type 'l source
 
-(** Make a source to listen with. (With int formulas) *)
-val make_int_source : unit -> int source
-
-(** Make a source to listen with (With float formulas) *)
-val make_float_source : unit -> int source
+(** Make a source to listen with. *)
+val make_source : unit -> 'm source
 
 (** Listen with a specified source *)
-val listen : 'a source -> unit
+val listen : 'n source -> unit
 
 (** Note: 
   Refining event listeners via the [source] type with [exec_while] is mentioned in the next section! 
@@ -215,15 +225,21 @@ val listen : 'a source -> unit
 (** {1 Event listener constructors} *)
 
 (** Listen and execute a function when a [formula] changes value. *)
-val on_change : 'a formula -> (unit -> unit) -> unit
+val on_change : 'o formula -> ('o -> 'o -> unit) -> unit
 
 (** Listen and execute a function when a [system] changes value. *)
-val system_change : 'a system -> (unit -> unit) -> unit
+val system_change : 'p system -> (bool -> bool -> unit) -> unit
 
 (** Listen and execute when a [system] becomes true. *)
-val when_satisfied : 'a system -> (unit -> unit) -> unit
+val when_satisfied : 'q system -> (unit -> unit) -> unit
+
+(** Source event listener. Suppose [s] has registered a system [eq].
+    Execute function if [listen s] is called and supply the current value of [eq].
+*)
+val exec_always : 'r source -> 'r system -> (bool -> unit) -> unit
 
 (** Source event listener. Suppose [s] has registered a system [eq].
     Execute function if the [eq] is currently [true] and [listen s] is called.
 *)
-val exec_while : 'a source -> 'a system -> (unit -> unit) -> unit
+val exec_while : 's source -> 's system -> (unit -> unit) -> unit
+
