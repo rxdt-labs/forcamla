@@ -93,6 +93,14 @@ val ( *. ) : float formula -> float formula -> float formula
 (** Shorthand for division in a float formula. *)
 val (/.) : float formula -> float formula -> float formula
 
+(** {2 Concat [string formula]} *)
+
+(** Create a formula that is the concatenation of two string formula. *)
+val concat_strings : string formula -> string formula -> string formula
+
+(** Shorthand for concatenation of two formula. *)
+val (^) : string formula -> string formula -> string formula
+
 (** {1 [system] Constructors} *)
 
 (** {2 Fundamental [system] Constructors} *)

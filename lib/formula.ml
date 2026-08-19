@@ -174,6 +174,10 @@ let ( *. ) = mul_form_float
 let div_form_float = bin_form_a (/.) (fun a b -> BinOp (a, b, (/.)))
 let (/.) = div_form_float
 
+(* Concatenation of new types. *)
+let concat_strings = bin_form_a (^) (fun a b -> BinOp (a, b, (^)))
+let (^) = concat_strings
+
 (* Comparison operators. (Equation creation) *)
 
 let system_create (e: 'q system_expr) (value: bool): 'q system =
