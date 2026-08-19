@@ -79,8 +79,10 @@ let rec propegate (f: 'l formula) (old_val: 'l): unit =
 and propegate_system (eq: 'l system) (old_value: bool): unit =
   List.iter (fun g -> g old_value eq.value) eq.on_change;
   if eq.value = true then 
-    (List.iter (fun g -> g ()) eq.when_satisfied;
-    List.iter (fun (p: 'l system) -> p.needs_update <- true) eq.parents) else ()
+    List.iter (fun g -> g ()) eq.when_satisfied;
+  List.iter (fun (p: 'l system) -> p.needs_update <- true) eq.parents;
+  List.iter update_system eq.parents;
+  eq.needs_update <- false
 and update_a_term (f: 'l formula) (new_val: 'a) =
   let old_val = f.value in
   match f.expression with
@@ -234,19 +236,19 @@ let gte_form_float = comp_form_a (>=) (fun a b -> Comparison (a.expression, b.ex
 let (>=.) = gte_form_float
 
 (* Less than of two int formulas. *)
-let lt_form_int = comp_form_a (>) (fun a b -> Comparison (a.expression, b.expression, (<)))
+let lt_form_int = comp_form_a (<) (fun a b -> Comparison (a.expression, b.expression, (<)))
 let (<?) = lt_form_int
 
 (* Less than or equals of two int formulas. *)
-let lte_form_int = comp_form_a (>=) (fun a b -> Comparison (a.expression, b.expression, (<=)))
+let lte_form_int = comp_form_a (<=) (fun a b -> Comparison (a.expression, b.expression, (<=)))
 let (<=?) = lte_form_int
 
 (* Less than of two float formulas. *)
-let lt_form_float = comp_form_a (>) (fun a b -> Comparison (a.expression, b.expression, (<)))
+let lt_form_float = comp_form_a (<) (fun a b -> Comparison (a.expression, b.expression, (<)))
 let (<.) = lt_form_float
 
 (* Less than or equals of two float formulas. *)
-let lte_form_float = comp_form_a (>=) (fun a b -> Comparison (a.expression, b.expression, (<=)))
+let lte_form_float = comp_form_a (<=) (fun a b -> Comparison (a.expression, b.expression, (<=)))
 let (<=.) = lte_form_float
 
 (* System creation *)
