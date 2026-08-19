@@ -77,4 +77,4 @@ let () = player.health =: !player.health - 1 (* Now something happens! player.he
 
 ## Documentation
 
-More examples and an API reference can be found [here.](https://thyrgle.github.io/forcamla/forcamla/index.html)
+More examples and an API reference can be found [here.](https://rxdt-labs.github.io/forcamla/index.html)
