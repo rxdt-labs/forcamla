@@ -176,9 +176,15 @@ let ( *. ) = mul_form_float
 let div_form_float = bin_form_a (/.) (fun a b -> BinOp (a, b, (/.)))
 let (/.) = div_form_float
 
-(* Concatenation of new types. *)
+(* Concatenation of string formula. *)
 let concat_strings = bin_form_a (^) (fun a b -> BinOp (a, b, (^)))
 let (^) = concat_strings
+
+(* Logical and of boolean formula. *)
+let and_ = bin_form_a (&&) (fun a b -> BinOp (a, b, (&&)))
+
+(* Logical or of boolean formula *)
+let or_ = bin_form_a (||) (fun a b -> BinOp (a, b, (||)))
 
 (* Comparison operators. (Equation creation) *)
 

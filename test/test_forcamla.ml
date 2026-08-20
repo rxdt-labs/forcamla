@@ -255,6 +255,34 @@ let test_string_concat () =
   s1 =: "goodbye";
   (check string) "goodbye world" "goodbye world" !s3
 
+let test_string_concat_three () =
+  let open Formula in
+  let s1 = t "a" in
+  let s2 = t "b" in
+  let s3 = t "c" in
+  let all = s1 ^ s2 ^ s3 in
+  (check string) "abc" "abc" !all;
+  s2 =: "X";
+  (check string) "aXc" "aXc" !all
+
+let test_string_concat_empty () =
+  let open Formula in
+  let s1 = t "hello" in
+  let s2 = t "" in
+  let s3 = s1 ^ s2 in
+  (check string) "hello" "hello" !s3;
+  s1 =: "";
+  (check string) "empty" "" !s3
+
+let test_concat_named () =
+  let open Formula in
+  let s1 = t "foo" in
+  let s2 = t "bar" in
+  let s3 = concat_strings s1 s2 in
+  (check string) "foobar" "foobar" !s3;
+  s1 =: "baz";
+  (check string) "bazbar" "bazbar" !s3
+
 let test_custom_binop () =
   let open Formula in
   let max_f = formula_reg_bin max in
@@ -396,6 +424,67 @@ let test_sys_nested () =
   x =: 2;
   (check bool) "2 in range" true !!sys
 
+let test_form_and () =
+  let open Formula in
+  let a = t true in
+  let b = t false in
+  let f = and_ a b in
+  (check bool) "true && false" false !f;
+  b =: true;
+  (check bool) "true && true" true !f;
+  a =: false;
+  (check bool) "false && true" false !f
+
+let test_form_or () =
+  let open Formula in
+  let a = t false in
+  let b = t false in
+  let f = or_ a b in
+  (check bool) "false || false" false !f;
+  b =: true;
+  (check bool) "false || true" true !f;
+  a =: true;
+  (check bool) "true || true" true !f;
+  b =: false;
+  (check bool) "true || false" true !f
+
+let test_form_and_nested () =
+  let open Formula in
+  let a = t true in
+  let b = t true in
+  let c = t false in
+  let f = and_ (and_ a b) c in
+  (check bool) "true && true && false" false !f;
+  c =: true;
+  (check bool) "true && true && true" true !f;
+  a =: false;
+  (check bool) "false && true && true" false !f
+
+let test_form_or_nested () =
+  let open Formula in
+  let a = t false in
+  let b = t false in
+  let c = t false in
+  let f = or_ (or_ a b) c in
+  (check bool) "false || false || false" false !f;
+  c =: true;
+  (check bool) "false || false || true" true !f;
+  c =: false;
+  b =: true;
+  (check bool) "false || true || false" true !f
+
+let test_form_and_or_mixed () =
+  let open Formula in
+  let a = t true in
+  let b = t false in
+  let c = t true in
+  let f = and_ (or_ a b) c in
+  (check bool) "(true || false) && true" true !f;
+  a =: false;
+  (check bool) "(false || false) && true" false !f;
+  b =: true;
+  (check bool) "(false || true) && true" true !f
+
 let test_when_satisfied_and () =
   let open Formula in
   let count = ref 0 in
@@ -519,6 +608,9 @@ let () =
         test_case "Division (float)" `Quick test_div_float;
         test_case "Deep dependency chain" `Quick test_deep_chain;
         test_case "String concatenation" `Quick test_string_concat;
+        test_case "String concatenation (three)" `Quick test_string_concat_three;
+        test_case "String concatenation (empty)" `Quick test_string_concat_empty;
+        test_case "Named concat_strings" `Quick test_concat_named;
         test_case "Custom binary operator" `Quick test_custom_binop;
       ];
       "comparisons", [
@@ -533,6 +625,13 @@ let () =
         test_case "And of two equations" `Quick test_sys_and;
         test_case "Or of two equations" `Quick test_sys_or;
         test_case "Nested systems" `Quick test_sys_nested;
+      ];
+      "bool-formula", [
+        test_case "and_ of two bool terms" `Quick test_form_and;
+        test_case "or_ of two bool terms" `Quick test_form_or;
+        test_case "nested and_" `Quick test_form_and_nested;
+        test_case "nested or_" `Quick test_form_or_nested;
+        test_case "mixed and_/or_" `Quick test_form_and_or_mixed;
       ];
       "listeners", [
         test_case "on_change on formula" `Quick test_on_change_formula;

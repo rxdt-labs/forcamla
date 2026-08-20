@@ -101,6 +101,14 @@ val concat_strings : string formula -> string formula -> string formula
 (** Shorthand for concatenation of two formula. *)
 val (^) : string formula -> string formula -> string formula
 
+(** {2 [bool formula] operations} (Shorthand below!) *)
+
+(** Logical and of two [bool formula] *)
+val and_ : bool formula -> bool formula -> bool formula
+
+(** Logical or of two [bool formula] *)
+val or_ : bool formula -> bool formula -> bool formula
+
 (** {1 [system] Constructors} *)
 
 (** {2 Fundamental [system] Constructors} *)
