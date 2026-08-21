@@ -9,7 +9,7 @@ authors: ["Christopher Sumnicht <csumnicht@berkeley.edu>"]
 license: "Apache-2.0"
 tags: ["mathematical programming" "formula" "event listeners"]
 homepage: "https://github.com/thyrgle/forcamla"
-doc: "https://thyrgle.github.io/forcamla/"
+doc: "https://rxdt-labs.github.io/forcamla/"
 bug-reports: "https://github.com/thyrgle/forcamla/issues"
 depends: [
   "ocaml" {>= "5.0.0"}

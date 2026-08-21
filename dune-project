@@ -13,7 +13,7 @@
 
 (license Apache-2.0)
 
-(documentation https://thyrgle.github.io/forcamla/)
+(documentation https://rxdt-labs.github.io/forcamla/)
 
 (package
  (name forcamla)
